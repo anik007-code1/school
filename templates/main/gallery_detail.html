@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ image.title }} - Gallery - {{ school_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="bg-teal-600 text-white">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center mb-2">
+            <a href="{% url 'main:gallery' %}{% if image.category %}?category={{ image.category.id }}{% endif %}" class="text-teal-200 hover:text-white mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <h1 class="text-2xl md:text-3xl font-bold">{{ image.title }}</h1>
+        </div>
+        <p class="mt-1 text-teal-100">{{ image.category.name }}</p>
+    </div>
+</div>
+
+<!-- Image Detail -->
+<div class="py-8 bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Image Navigation -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <div>
+                    {% if prev_image_id %}
+                        <a href="{% url 'main:gallery_detail' prev_image_id %}" class="inline-flex items-center text-gray-600 hover:text-teal-600">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous
+                        </a>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="{% url 'main:gallery' %}{% if image.category %}?category={{ image.category.id }}{% endif %}" class="text-gray-600 hover:text-teal-600">
+                        Back to Gallery
+                    </a>
+                </div>
+                <div>
+                    {% if next_image_id %}
+                        <a href="{% url 'main:gallery_detail' next_image_id %}" class="inline-flex items-center text-gray-600 hover:text-teal-600">
+                            Next
+                            <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Main Image -->
+            <div class="p-4">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="w-full h-auto rounded-lg">
+            </div>
+            
+            <!-- Image Info -->
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ image.title }}</h2>
+                
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>{{ image.upload_date|date:"F d, Y" }}</span>
+                    <span class="mx-2">•</span>
+                    <span>Category: {{ image.category.name }}</span>
+                </div>
+                
+                {% if image.description %}
+                    <div class="prose max-w-none">
+                        <p class="text-gray-700">{{ image.description|linebreaks }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="mt-8 flex items-center justify-between">
+            {% if prev_image_id %}
+                <a href="{% url 'main:gallery_detail' prev_image_id %}" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Previous Image
+                </a>
+            {% else %}
+                <div></div>
+            {% endif %}
+            
+            <a href="{% url 'main:gallery' %}{% if image.category %}?category={{ image.category.id }}{% endif %}" 
+               class="inline-flex items-center px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-700 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                Back to Gallery
+            </a>
+            
+            {% if next_image_id %}
+                <a href="{% url 'main:gallery_detail' next_image_id %}" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors">
+                    Next Image
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            {% else %}
+                <div></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

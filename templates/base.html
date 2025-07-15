@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+{% load i18n %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "School Website" %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'main:home' %}" class="flex items-center">
+                        <div class="flex-shrink-0 flex items-center justify-between">
+                            {% if school_logo %}
+                                <img src="{{ school_logo }}" alt="{{ school_name }}" class="h-12 w-12 mr-3 rounded-full object-cover">
+                            {% endif %}
+                            <div>
+                                <h1 class="text-xl font-bold text-primary">{{ school_name }}</h1>
+                                <p class="text-xs text-gray-600 hidden sm:block">{{ school_tagline }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Home" %}</a>
+                    <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Notices" %}</a>
+                    <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Teachers" %}</a>
+                    <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Headmaster" %}</a>
+                    <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Gallery" %}</a>
+                    <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Managing Committee" %}</a>
+                    <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">{% trans "Contact" %}</a>
+
+                    <!-- Language Switcher -->
+                    <div class="relative ml-4">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        <div class="flex items-center space-x-2">
+                            {% for lang_code, lang_name in LANGUAGES %}
+                                {% if lang_code != LANGUAGE_CODE %}
+                                    <form action="{% url 'set_language' %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <input name="language" type="hidden" value="{{ lang_code }}">
+                                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 text-sm rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
+                                            {{ lang_name }}
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="bg-primary text-white text-sm rounded-md px-3 py-1">{{ lang_name }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" class="mobile-menu-button text-gray-700 hover:text-primary focus:outline-none focus:text-primary">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
+                <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Home" %}</a>
+                <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Notices" %}</a>
+                <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Teachers" %}</a>
+                <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Headmaster" %}</a>
+                <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Gallery" %}</a>
+                <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Managing Committee" %}</a>
+                <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">{% trans "Contact" %}</a>
+
+                <!-- Mobile Language Switcher -->
+                <div class="mt-4 px-3">
+                    <div class="flex items-center">
+                        <label class="block text-sm font-medium text-gray-700 mr-2">{% trans "Language" %}:</label>
+                        <div class="flex space-x-2">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% for lang_code, lang_name in LANGUAGES %}
+                                {% if lang_code != LANGUAGE_CODE %}
+                                    <form action="{% url 'set_language' %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <input name="language" type="hidden" value="{{ lang_code }}">
+                                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 text-sm rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
+                                            {{ lang_name }}
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="bg-primary text-white text-sm rounded-md px-3 py-1">{{ lang_name }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                {% if school_logo %}
+                    <img src="{{ school_logo }}" alt="{{ school_name }}" class="h-16 w-16 mx-auto mb-4 rounded-full object-cover">
+                {% endif %}
+                <h3 class="text-lg font-semibold mb-2">{{ school_name }}</h3>
+                <p class="text-gray-300 text-sm mb-2">{{ school_tagline }}</p>
+                <p class="text-gray-400 text-sm">© 2024 {{ school_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile menu toggle script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
