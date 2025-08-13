@@ -212,3 +212,61 @@ class NavigationLink(models.Model):
         if language == 'bn' and self.title_bn:
             return self.title_bn
         return self.title
+
+
+class ContactInfo(models.Model):
+    # Basic Information
+    page_title = models.CharField(max_length=200, default="Contact Us")
+    page_title_bn = models.CharField(max_length=200, blank=True, help_text="Bengali page title")
+    page_subtitle = models.CharField(max_length=300, default="Get in touch with us for any inquiries or information")
+    page_subtitle_bn = models.CharField(max_length=300, blank=True, help_text="Bengali page subtitle")
+
+    # Address Information
+    address = models.TextField(help_text="Full address of the school")
+    address_bn = models.TextField(blank=True, help_text="Bengali address")
+
+    # Phone Numbers
+    main_phone = models.CharField(max_length=50, help_text="Main office phone number")
+    admissions_phone = models.CharField(max_length=50, blank=True, help_text="Admissions phone number")
+    additional_phone = models.CharField(max_length=50, blank=True, help_text="Additional phone number")
+
+    # Email Addresses
+    general_email = models.EmailField(help_text="General contact email")
+    admissions_email = models.EmailField(blank=True, help_text="Admissions email")
+
+    # Office Hours
+    office_hours = models.TextField(help_text="Office hours information")
+    office_hours_bn = models.TextField(blank=True, help_text="Bengali office hours")
+
+    # Map Information
+    map_embed_code = models.TextField(blank=True, help_text="Google Maps embed code (iframe)")
+    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, help_text="Latitude for map")
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True, help_text="Longitude for map")
+
+    # Contact Form Settings
+    enable_contact_form = models.BooleanField(default=True, help_text="Enable contact form on the page")
+    form_title = models.CharField(max_length=200, default="Send us a Message")
+    form_title_bn = models.CharField(max_length=200, blank=True, help_text="Bengali form title")
+
+    # Additional Information
+    additional_info = models.TextField(blank=True, help_text="Any additional contact information")
+    additional_info_bn = models.TextField(blank=True, help_text="Bengali additional information")
+
+    # Meta
+    is_active = models.BooleanField(default=True, help_text="Use this contact information")
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Contact Information"
+        verbose_name_plural = "Contact Information"
+        ordering = ['-is_active', '-updated_date']
+
+    def __str__(self):
+        return f"Contact Info - {self.page_title}"
+
+    def save(self, *args, **kwargs):
+        # Ensure only one active contact info exists
+        if self.is_active:
+            ContactInfo.objects.filter(is_active=True).exclude(pk=self.pk).update(is_active=False)
+        super().save(*args, **kwargs)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo, GalleryCategory, GalleryImage, NavigationLink
+from .models import Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo, GalleryCategory, GalleryImage, NavigationLink, ContactInfo
 
 
 @admin.register(Notice)
@@ -153,3 +153,54 @@ class NavigationLinkAdmin(admin.ModelAdmin):
             """
 
         return form
+
+
+@admin.register(ContactInfo)
+class ContactInfoAdmin(admin.ModelAdmin):
+    list_display = ['page_title', 'general_email', 'main_phone', 'is_active', 'updated_date']
+    list_filter = ['is_active', 'created_date', 'updated_date']
+    search_fields = ['page_title', 'address', 'general_email', 'main_phone']
+    list_editable = ['is_active']
+
+    fieldsets = (
+        ('Page Information', {
+            'fields': ('page_title', 'page_title_bn', 'page_subtitle', 'page_subtitle_bn')
+        }),
+        ('Address', {
+            'fields': ('address', 'address_bn')
+        }),
+        ('Phone Numbers', {
+            'fields': ('main_phone', 'admissions_phone', 'additional_phone')
+        }),
+        ('Email Addresses', {
+            'fields': ('general_email', 'admissions_email')
+        }),
+        ('Office Hours', {
+            'fields': ('office_hours', 'office_hours_bn')
+        }),
+        ('Map Information', {
+            'fields': ('map_embed_code', 'latitude', 'longitude'),
+            'classes': ('collapse',),
+            'description': 'Add Google Maps embed code or coordinates for location display'
+        }),
+        ('Contact Form', {
+            'fields': ('enable_contact_form', 'form_title', 'form_title_bn')
+        }),
+        ('Additional Information', {
+            'fields': ('additional_info', 'additional_info_bn'),
+            'classes': ('collapse',)
+        }),
+        ('Settings', {
+            'fields': ('is_active',)
+        })
+    )
+
+    def has_add_permission(self, request):
+        # Allow adding only if no active contact info exists
+        return not ContactInfo.objects.filter(is_active=True).exists()
+
+    def has_delete_permission(self, request, obj=None):
+        # Don't allow deleting the active contact info
+        if obj and obj.is_active:
+            return False
+        return super().has_delete_permission(request, obj)

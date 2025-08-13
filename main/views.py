@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.utils import translation
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from .models import Notice, Teacher, CommitteeMember, Headmaster, GalleryCategory, GalleryImage
+from .models import Notice, Teacher, CommitteeMember, Headmaster, GalleryCategory, GalleryImage, ContactInfo
 
 
 def home(request):
@@ -59,7 +59,15 @@ def committee(request):
 
 def contact(request):
     """Contact page view"""
-    return render(request, 'main/contact.html')
+    try:
+        contact_info = ContactInfo.objects.filter(is_active=True).first()
+    except ContactInfo.DoesNotExist:
+        contact_info = None
+
+    context = {
+        'contact_info': contact_info,
+    }
+    return render(request, 'main/contact.html', context)
 
 
 def headmaster(request):
