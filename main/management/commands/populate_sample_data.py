@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from main.models import Teacher, CommitteeMember, Headmaster, Notice, GalleryCategory, GalleryImage
+from main.models import Teacher, CommitteeMember, Headmaster, Notice, GalleryCategory, GalleryImage, NavigationLink
 from django.core.files.base import ContentFile
 import io
 
@@ -379,6 +379,118 @@ Let's make science fun and meaningful!''',
             )
             if created:
                 self.stdout.write(f'Created gallery category: {category.name}')
+
+        # Create sample navigation links
+        navigation_links = [
+            # Important Links
+            {
+                'title': 'Admission Form',
+                'title_bn': 'ভর্তির ফরম',
+                'link_type': 'external',
+                'url': 'https://example.com/admission-form',
+                'position': 'important',
+                'order': 1,
+                'is_active': True,
+                'open_new_tab': True,
+                'icon_class': 'fas fa-file-alt',
+                'description': 'Download admission form for new students'
+            },
+            {
+                'title': 'Academic Calendar',
+                'title_bn': 'একাডেমিক ক্যালেন্ডার',
+                'link_type': 'external',
+                'url': 'https://example.com/academic-calendar',
+                'position': 'important',
+                'order': 2,
+                'is_active': True,
+                'open_new_tab': True,
+                'icon_class': 'fas fa-calendar',
+                'description': 'View academic calendar and important dates'
+            },
+            {
+                'title': 'Online Classes',
+                'title_bn': 'অনলাইন ক্লাস',
+                'link_type': 'external',
+                'url': 'https://meet.google.com',
+                'position': 'important',
+                'order': 3,
+                'is_active': True,
+                'open_new_tab': True,
+                'icon_class': 'fas fa-video',
+                'description': 'Access online classes and virtual meetings'
+            },
+            {
+                'title': 'Student Portal',
+                'title_bn': 'শিক্ষার্থী পোর্টাল',
+                'link_type': 'external',
+                'url': 'https://example.com/student-portal',
+                'position': 'important',
+                'order': 4,
+                'is_active': True,
+                'open_new_tab': True,
+                'icon_class': 'fas fa-user-graduate',
+                'description': 'Student login portal for grades and assignments'
+            },
+
+            # Footer Links
+            {
+                'title': 'Privacy Policy',
+                'title_bn': 'গোপনীয়তা নীতি',
+                'link_type': 'external',
+                'url': 'https://example.com/privacy-policy',
+                'position': 'footer',
+                'order': 1,
+                'is_active': True,
+                'open_new_tab': False,
+                'icon_class': 'fas fa-shield-alt',
+                'description': 'School privacy policy and data protection'
+            },
+            {
+                'title': 'Terms of Service',
+                'title_bn': 'সেবার শর্তাবলী',
+                'link_type': 'external',
+                'url': 'https://example.com/terms-of-service',
+                'position': 'footer',
+                'order': 2,
+                'is_active': True,
+                'open_new_tab': False,
+                'icon_class': 'fas fa-file-contract',
+                'description': 'Terms and conditions for website usage'
+            },
+            {
+                'title': 'School Facebook',
+                'title_bn': 'স্কুল ফেসবুক',
+                'link_type': 'external',
+                'url': 'https://facebook.com/noagaonhighschool',
+                'position': 'footer',
+                'order': 3,
+                'is_active': True,
+                'open_new_tab': True,
+                'icon_class': 'fab fa-facebook',
+                'description': 'Follow us on Facebook for updates'
+            },
+            {
+                'title': 'Contact Form',
+                'title_bn': 'যোগাযোগ ফরম',
+                'link_type': 'internal',
+                'internal_page': 'main:contact',
+                'position': 'footer',
+                'order': 4,
+                'is_active': True,
+                'open_new_tab': False,
+                'icon_class': 'fas fa-envelope',
+                'description': 'Send us a message through contact form'
+            }
+        ]
+
+        for link_data in navigation_links:
+            link, created = NavigationLink.objects.get_or_create(
+                title=link_data['title'],
+                position=link_data['position'],
+                defaults=link_data
+            )
+            if created:
+                self.stdout.write(f'Created navigation link: {link.title} ({link.get_position_display()})')
 
         self.stdout.write(
             self.style.SUCCESS('Successfully populated database with sample data!')

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo, GalleryCategory, GalleryImage
+from .models import Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo, GalleryCategory, GalleryImage, NavigationLink
 
 
 @admin.register(Notice)
@@ -115,3 +115,41 @@ class GalleryImageAdmin(admin.ModelAdmin):
         if obj:  # Editing existing object
             return self.readonly_fields + ['upload_date', 'uploaded_by']
         return self.readonly_fields
+
+
+@admin.register(NavigationLink)
+class NavigationLinkAdmin(admin.ModelAdmin):
+    list_display = ['title', 'position', 'link_type', 'order', 'is_active', 'created_date']
+    list_filter = ['position', 'link_type', 'is_active', 'created_date']
+    search_fields = ['title', 'title_bn', 'description']
+    list_editable = ['order', 'is_active']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'title_bn', 'position', 'order', 'is_active')
+        }),
+        ('Link Configuration', {
+            'fields': ('link_type', 'url', 'internal_page', 'file_upload', 'open_new_tab')
+        }),
+        ('Display Options', {
+            'fields': ('icon_class', 'description'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        # Add help text for internal_page field
+        if 'internal_page' in form.base_fields:
+            form.base_fields['internal_page'].help_text = """
+            Common internal pages:
+            • main:home - Homepage
+            • main:notices - Notices page
+            • main:teachers - Teachers page
+            • main:headmaster - Headmaster page
+            • main:gallery - Gallery page
+            • main:committee - Committee page
+            • main:contact - Contact page
+            """
+
+        return form

@@ -153,3 +153,62 @@ class GalleryImage(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.category.name}"
+
+
+class NavigationLink(models.Model):
+    LINK_TYPE_CHOICES = [
+        ('internal', 'Internal Page'),
+        ('external', 'External URL'),
+        ('file', 'File Download'),
+    ]
+
+    POSITION_CHOICES = [
+        ('main', 'Main Navigation'),
+        ('important', 'Important Links'),
+        ('footer', 'Footer Links'),
+    ]
+
+    title = models.CharField(max_length=100, help_text="Display name for the link")
+    title_bn = models.CharField(max_length=100, blank=True, help_text="Bengali title (optional)")
+    link_type = models.CharField(max_length=10, choices=LINK_TYPE_CHOICES, default='external')
+    url = models.URLField(blank=True, help_text="External URL (for external links)")
+    internal_page = models.CharField(max_length=100, blank=True,
+                                   help_text="Internal page name (e.g., 'main:home', 'main:notices')")
+    file_upload = models.FileField(upload_to='navigation_files/', blank=True, null=True,
+                                 help_text="File to download (for file links)")
+    position = models.CharField(max_length=20, choices=POSITION_CHOICES, default='important')
+    order = models.PositiveIntegerField(default=0, help_text="Display order")
+    is_active = models.BooleanField(default=True)
+    open_new_tab = models.BooleanField(default=False, help_text="Open link in new tab")
+    icon_class = models.CharField(max_length=100, blank=True,
+                                help_text="CSS icon class (e.g., 'fas fa-home')")
+    description = models.TextField(blank=True, help_text="Link description")
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['position', 'order', 'title']
+        verbose_name = "Navigation Link"
+        verbose_name_plural = "Navigation Links"
+
+    def __str__(self):
+        return f"{self.title} ({self.get_position_display()})"
+
+    def get_url(self):
+        """Return the appropriate URL based on link type"""
+        if self.link_type == 'external':
+            return self.url
+        elif self.link_type == 'internal' and self.internal_page:
+            try:
+                from django.urls import reverse
+                return reverse(self.internal_page)
+            except:
+                return '#'
+        elif self.link_type == 'file' and self.file_upload:
+            return self.file_upload.url
+        return '#'
+
+    def get_title(self, language='en'):
+        """Return title in specified language"""
+        if language == 'bn' and self.title_bn:
+            return self.title_bn
+        return self.title
