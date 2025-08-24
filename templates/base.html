@@ -63,10 +63,10 @@
                     <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
                         <i class="fas fa-bullhorn mr-1"></i>Notices
                     </a>
-                    <a href="/students/" class="text-gray-700 hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-green-50">
+                    <a href="{% url 'main:students' %}" class="text-gray-700 hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-green-50">
                         <i class="fas fa-users mr-1"></i>Total Students
                     </a>
-                    <a href="/exam-results/" class="text-gray-700 hover:text-warning px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-orange-50">
+                    <a href="{% url 'main:exam_results' %}" class="text-gray-700 hover:text-warning px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-orange-50">
                         <i class="fas fa-chart-line mr-1"></i>Exam Results
                     </a>
                     <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
@@ -106,10 +106,10 @@
                 <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
                     <i class="fas fa-bullhorn mr-2"></i>Notices
                 </a>
-                <a href="/students/" class="text-gray-700 hover:text-accent block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                <a href="{% url 'main:students' %}" class="text-gray-700 hover:text-accent block px-3 py-2 rounded-md text-base font-medium transition-colors">
                     <i class="fas fa-users mr-2"></i>Total Students
                 </a>
-                <a href="/exam-results/" class="text-gray-700 hover:text-warning block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                <a href="{% url 'main:exam_results' %}" class="text-gray-700 hover:text-warning block px-3 py-2 rounded-md text-base font-medium transition-colors">
                     <i class="fas fa-chart-line mr-2"></i>Exam Results
                 </a>
                 <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
@@ -155,8 +155,8 @@
                     <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
                     <div class="space-y-2">
                         <a href="{% url 'main:notices' %}" class="block text-gray-300 hover:text-white transition-colors">Notices</a>
-                        <a href="/students/" class="block text-gray-300 hover:text-white transition-colors">Students</a>
-                        <a href="/exam-results/" class="block text-gray-300 hover:text-white transition-colors">Results</a>
+                        <a href="{% url 'main:students' %}" class="block text-gray-300 hover:text-white transition-colors">Students</a>
+                        <a href="{% url 'main:exam_results' %}" class="block text-gray-300 hover:text-white transition-colors">Results</a>
                         <a href="{% url 'main:contact' %}" class="block text-gray-300 hover:text-white transition-colors">Contact</a>
                     </div>
                 </div>
