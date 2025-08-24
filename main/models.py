@@ -298,14 +298,7 @@ class Student(models.Model):
     section = models.CharField(max_length=5, choices=SECTION_CHOICES, default='A', help_text="Student's section")
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, help_text="Student's gender")
     admission_date = models.DateField(help_text="Date of admission")
-    photo = models.ImageField(upload_to='students/', blank=True, null=True, help_text="Student's photo (optional)")
-    father_name = models.CharField(max_length=100, blank=True, help_text="Father's name")
-    mother_name = models.CharField(max_length=100, blank=True, help_text="Mother's name")
-    guardian_phone = models.CharField(max_length=20, blank=True, help_text="Guardian's phone number")
-    address = models.TextField(blank=True, help_text="Student's address")
     is_active = models.BooleanField(default=True, help_text="Is currently enrolled")
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['class_name', 'section', 'roll_number']
@@ -325,6 +318,7 @@ class ExamResult(models.Model):
     RESULT_TYPE_CHOICES = [
         ('pdf', 'PDF File'),
         ('image', 'Image File'),
+        ('text', 'Text Content'),
     ]
     
     EXAM_TYPE_CHOICES = [
@@ -353,6 +347,10 @@ class ExamResult(models.Model):
     result_file = models.FileField(upload_to='exam_results/', blank=True, null=True,
                                    help_text="Upload PDF or image file")
     
+    # Text content
+    text_content = models.TextField(blank=True, null=True,
+                                  help_text="Enter result content if using text format")
+    
     # Additional information
     exam_date = models.DateField(help_text="Date when exam was conducted")
     result_publish_date = models.DateField(help_text="Date when result was published")
@@ -375,8 +373,17 @@ class ExamResult(models.Model):
     def clean(self):
         from django.core.exceptions import ValidationError
         
-        if not self.result_file:
-            raise ValidationError("Result file is required.")
+        if self.result_type in ['pdf', 'image'] and not self.result_file:
+            raise ValidationError("File upload is required for PDF and Image type results.")
+        
+        if self.result_type == 'text' and not self.text_content:
+            raise ValidationError("Text content is required for Text type results.")
+        
+        if self.result_type == 'text' and self.result_file:
+            raise ValidationError("File should not be uploaded for Text type results.")
+        
+        if self.result_type in ['pdf', 'image'] and self.text_content:
+            raise ValidationError("Text content should be empty for PDF and Image type results.")
 
     def get_file_extension(self):
         """Get file extension for display purposes"""
@@ -386,29 +393,16 @@ class ExamResult(models.Model):
 
 
 class HomepageSlider(models.Model):
-    title = models.CharField(max_length=200, help_text="Slide title")
-    subtitle = models.CharField(max_length=300, blank=True, help_text="Slide subtitle (optional)")
     image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 1920x800px)")
-    caption = models.TextField(blank=True, help_text="Image caption or description")
-    
-    # Link options
-    link_url = models.URLField(blank=True, help_text="Optional link URL when slide is clicked")
-    link_text = models.CharField(max_length=100, blank=True, help_text="Link button text")
-    open_new_tab = models.BooleanField(default=False, help_text="Open link in new tab")
-    
-    # Display options
     order = models.PositiveIntegerField(default=0, help_text="Display order (lower numbers first)")
     is_active = models.BooleanField(default=True, help_text="Show this slide")
-    
-    # Meta information
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['order', '-created_date']
+        ordering = ['order']
         verbose_name = "Homepage Slider"
         verbose_name_plural = "Homepage Sliders"
 
     def __str__(self):
-        return f"{self.title} (Order: {self.order})"
+        return f"Slider Image {self.id} (Order: {self.order})"

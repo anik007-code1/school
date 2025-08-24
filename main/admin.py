@@ -303,26 +303,20 @@ class ExamResultAdmin(admin.ModelAdmin):
 
 @admin.register(HomepageSlider)
 class HomepageSliderAdmin(admin.ModelAdmin):
-    list_display = ['title', 'order', 'is_active', 'created_date', 'created_by']
-    list_filter = ['is_active', 'created_date', 'created_by']
-    search_fields = ['title', 'subtitle', 'caption']
+    list_display = ['id', 'order', 'is_active', 'created_date', 'created_by']
+    list_filter = ['is_active', 'created_by']
     list_editable = ['order', 'is_active']
-    readonly_fields = ['created_date', 'updated_date']
+    readonly_fields = ['created_date']
     
     fieldsets = (
         ('Slide Content', {
-            'fields': ('title', 'subtitle', 'image', 'caption')
-        }),
-        ('Link Settings', {
-            'fields': ('link_url', 'link_text', 'open_new_tab'),
-            'classes': ('collapse',),
-            'description': 'Optional: Add a link button to the slide'
+            'fields': ('image',)
         }),
         ('Display Settings', {
             'fields': ('order', 'is_active')
         }),
         ('Metadata', {
-            'fields': ('created_date', 'updated_date'),
+            'fields': ('created_date',),
             'classes': ('collapse',)
         })
     )

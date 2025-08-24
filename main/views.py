@@ -11,21 +11,11 @@ from .models import (Notice, Teacher, CommitteeMember, Headmaster, GalleryCatego
 def home(request):
     """Homepage view with slider"""
     latest_notices = Notice.objects.all()[:3]  # Show latest 3 notices
-    slider_images = HomepageSlider.objects.filter(is_active=True)[:5]  # Show max 5 slides
+    slider_images = HomepageSlider.objects.filter(is_active=True).order_by('order')[:5]  # Show max 5 slides
     
-    # Get some quick stats for homepage
-    total_students = Student.objects.filter(is_active=True).count()
-    total_teachers = Teacher.objects.count()
-    
-    # Debug: Print current language
-    current_language = translation.get_language()
-    print(f"Current language: {current_language}")
-
     context = {
         'latest_notices': latest_notices,
         'slider_images': slider_images,
-        'total_students': total_students,
-        'total_teachers': total_teachers,
     }
     return render(request, 'main/home.html', context)
 
@@ -179,19 +169,11 @@ def students(request):
         female=Count('id', filter=Q(gender='female'))
     ).order_by('class_name')
     
-    # Section-wise statistics for each class
-    section_stats = active_students.values('class_name', 'section').annotate(
-        total=Count('id'),
-        male=Count('id', filter=Q(gender='male')),
-        female=Count('id', filter=Q(gender='female'))
-    ).order_by('class_name', 'section')
-    
     context = {
         'total_students': total_students,
         'male_students': male_students,
         'female_students': female_students,
-        'class_stats': class_stats,
-        'section_stats': section_stats,
+        'class_stats': class_stats
     }
     return render(request, 'main/students.html', context)
 
