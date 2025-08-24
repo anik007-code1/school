@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo, GalleryCategory, GalleryImage, NavigationLink, ContactInfo
+from .models import (Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo,
+                     GalleryCategory, GalleryImage, NavigationLink, ContactInfo,
+                     Student, ExamResult, HomepageSlider)
 
 
 @admin.register(Notice)
@@ -204,3 +206,145 @@ class ContactInfoAdmin(admin.ModelAdmin):
         if obj and obj.is_active:
             return False
         return super().has_delete_permission(request, obj)
+
+
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'roll_number', 'class_name', 'section', 'gender', 'is_active', 'admission_date']
+    list_filter = ['class_name', 'section', 'gender', 'is_active', 'admission_date']
+    search_fields = ['name', 'roll_number', 'father_name', 'mother_name']
+    list_editable = ['is_active']
+    date_hierarchy = 'admission_date'
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'roll_number', 'class_name', 'section', 'gender', 'photo')
+        }),
+        ('Academic Information', {
+            'fields': ('admission_date', 'is_active')
+        }),
+        ('Family Information', {
+            'fields': ('father_name', 'mother_name', 'guardian_phone'),
+            'classes': ('collapse',)
+        }),
+        ('Contact Information', {
+            'fields': ('address',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related()
+    
+    actions = ['mark_active', 'mark_inactive']
+    
+    def mark_active(self, request, queryset):
+        queryset.update(is_active=True)
+        self.message_user(request, f"{queryset.count()} students marked as active.")
+    mark_active.short_description = "Mark selected students as active"
+    
+    def mark_inactive(self, request, queryset):
+        queryset.update(is_active=False)
+        self.message_user(request, f"{queryset.count()} students marked as inactive.")
+    mark_inactive.short_description = "Mark selected students as inactive"
+
+
+@admin.register(ExamResult)
+class ExamResultAdmin(admin.ModelAdmin):
+    list_display = ['title', 'class_name', 'exam_type', 'result_publish_date', 'is_published', 'uploaded_by']
+    list_filter = ['class_name', 'exam_type', 'is_published', 'result_publish_date', 'uploaded_by']
+    search_fields = ['title', 'description']
+    list_editable = ['is_published']
+    date_hierarchy = 'result_publish_date'
+    readonly_fields = ['upload_date', 'updated_date']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'class_name', 'exam_type', 'result_type')
+        }),
+        ('File Upload', {
+            'fields': ('result_file',),
+            'description': 'Upload PDF or image file containing the exam results'
+        }),
+        ('Exam Details', {
+            'fields': ('exam_date', 'result_publish_date', 'description')
+        }),
+        ('Publication Settings', {
+            'fields': ('is_published',)
+        }),
+        ('Metadata', {
+            'fields': ('upload_date', 'updated_date'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new object
+            obj.uploaded_by = request.user
+        super().save_model(request, obj, form, change)
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing existing object
+            return self.readonly_fields + ['uploaded_by']
+        return self.readonly_fields
+    
+    actions = ['publish_results', 'unpublish_results']
+    
+    def publish_results(self, request, queryset):
+        queryset.update(is_published=True)
+        self.message_user(request, f"{queryset.count()} results published.")
+    publish_results.short_description = "Publish selected results"
+    
+    def unpublish_results(self, request, queryset):
+        queryset.update(is_published=False)
+        self.message_user(request, f"{queryset.count()} results unpublished.")
+    unpublish_results.short_description = "Unpublish selected results"
+
+
+@admin.register(HomepageSlider)
+class HomepageSliderAdmin(admin.ModelAdmin):
+    list_display = ['title', 'order', 'is_active', 'created_date', 'created_by']
+    list_filter = ['is_active', 'created_date', 'created_by']
+    search_fields = ['title', 'subtitle', 'caption']
+    list_editable = ['order', 'is_active']
+    readonly_fields = ['created_date', 'updated_date']
+    
+    fieldsets = (
+        ('Slide Content', {
+            'fields': ('title', 'subtitle', 'image', 'caption')
+        }),
+        ('Link Settings', {
+            'fields': ('link_url', 'link_text', 'open_new_tab'),
+            'classes': ('collapse',),
+            'description': 'Optional: Add a link button to the slide'
+        }),
+        ('Display Settings', {
+            'fields': ('order', 'is_active')
+        }),
+        ('Metadata', {
+            'fields': ('created_date', 'updated_date'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new object
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing existing object
+            return self.readonly_fields + ['created_by']
+        return self.readonly_fields
+    
+    actions = ['activate_slides', 'deactivate_slides']
+    
+    def activate_slides(self, request, queryset):
+        queryset.update(is_active=True)
+        self.message_user(request, f"{queryset.count()} slides activated.")
+    activate_slides.short_description = "Activate selected slides"
+    
+    def deactivate_slides(self, request, queryset):
+        queryset.update(is_active=False)
+        self.message_user(request, f"{queryset.count()} slides deactivated.")
+    deactivate_slides.short_description = "Deactivate selected slides"

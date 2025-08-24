@@ -13,4 +13,7 @@ urlpatterns = [
     path('gallery/', views.gallery, name='gallery'),
     path('gallery/image/<int:image_id>/', views.gallery_image_detail, name='gallery_detail'),
     path('contact/', views.contact, name='contact'),
+    path('students/', views.students, name='students'),
+    path('exam-results/', views.exam_results, name='exam_results'),
+    path('exam-result/<int:result_id>/', views.exam_result_detail, name='exam_result_detail'),
 ]

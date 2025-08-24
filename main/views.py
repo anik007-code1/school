@@ -3,19 +3,29 @@ from django.core.paginator import Paginator
 from django.utils import translation
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from .models import Notice, Teacher, CommitteeMember, Headmaster, GalleryCategory, GalleryImage, ContactInfo
+from django.db.models import Count, Q
+from .models import (Notice, Teacher, CommitteeMember, Headmaster, GalleryCategory,
+                     GalleryImage, ContactInfo, Student, ExamResult, HomepageSlider)
 
 
 def home(request):
-    """Homepage view"""
+    """Homepage view with slider"""
     latest_notices = Notice.objects.all()[:3]  # Show latest 3 notices
-
+    slider_images = HomepageSlider.objects.filter(is_active=True)[:5]  # Show max 5 slides
+    
+    # Get some quick stats for homepage
+    total_students = Student.objects.filter(is_active=True).count()
+    total_teachers = Teacher.objects.count()
+    
     # Debug: Print current language
     current_language = translation.get_language()
     print(f"Current language: {current_language}")
 
     context = {
         'latest_notices': latest_notices,
+        'slider_images': slider_images,
+        'total_students': total_students,
+        'total_teachers': total_teachers,
     }
     return render(request, 'main/home.html', context)
 
@@ -150,3 +160,81 @@ def switch_language(request, language_code):
         translation.activate(language_code)
 
     return response
+
+
+def students(request):
+    """Students statistics view"""
+    # Get all active students
+    active_students = Student.objects.filter(is_active=True)
+    
+    # Calculate statistics
+    total_students = active_students.count()
+    male_students = active_students.filter(gender='male').count()
+    female_students = active_students.filter(gender='female').count()
+    
+    # Class-wise statistics
+    class_stats = active_students.values('class_name').annotate(
+        total=Count('id'),
+        male=Count('id', filter=Q(gender='male')),
+        female=Count('id', filter=Q(gender='female'))
+    ).order_by('class_name')
+    
+    # Section-wise statistics for each class
+    section_stats = active_students.values('class_name', 'section').annotate(
+        total=Count('id'),
+        male=Count('id', filter=Q(gender='male')),
+        female=Count('id', filter=Q(gender='female'))
+    ).order_by('class_name', 'section')
+    
+    context = {
+        'total_students': total_students,
+        'male_students': male_students,
+        'female_students': female_students,
+        'class_stats': class_stats,
+        'section_stats': section_stats,
+    }
+    return render(request, 'main/students.html', context)
+
+
+def exam_results(request):
+    """Exam results view with class filtering"""
+    class_filter = request.GET.get('class')
+    exam_type_filter = request.GET.get('exam_type')
+    
+    # Get published results
+    results_list = ExamResult.objects.filter(is_published=True)
+    
+    # Apply filters
+    if class_filter:
+        results_list = results_list.filter(class_name=class_filter)
+    if exam_type_filter:
+        results_list = results_list.filter(exam_type=exam_type_filter)
+    
+    # Pagination
+    paginator = Paginator(results_list, 10)  # Show 10 results per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get available classes and exam types for filtering
+    available_classes = ExamResult.objects.filter(is_published=True).values_list(
+        'class_name', flat=True).distinct().order_by('class_name')
+    available_exam_types = ExamResult.objects.filter(is_published=True).values_list(
+        'exam_type', flat=True).distinct()
+    
+    context = {
+        'page_obj': page_obj,
+        'available_classes': available_classes,
+        'available_exam_types': available_exam_types,
+        'current_class': class_filter,
+        'current_exam_type': exam_type_filter,
+    }
+    return render(request, 'main/exam_results.html', context)
+
+
+def exam_result_detail(request, result_id):
+    """Individual exam result detail view"""
+    result = get_object_or_404(ExamResult, id=result_id, is_published=True)
+    context = {
+        'result': result,
+    }
+    return render(request, 'main/exam_result_detail.html', context)

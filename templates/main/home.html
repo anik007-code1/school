@@ -4,7 +4,77 @@
 {% block title %}{% trans "Home" %} - {{ school_name }}{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Image Slider Section -->
+{% if slider_images %}
+<div class="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden">
+    <div class="slider-container relative w-full h-full">
+        {% for slide in slider_images %}
+            <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out {% if forloop.first %}opacity-100{% endif %}"
+                 data-slide="{{ forloop.counter0 }}">
+                <div class="relative w-full h-full">
+                    {% if slide.image %}
+                        <img src="{{ slide.image.url }}"
+                             alt="{{ slide.title }}"
+                             class="w-full h-full object-cover">
+                    {% else %}
+                        <!-- Fallback gradient background when no image -->
+                        <div class="w-full h-full bg-gradient-to-r from-blue-600 to-blue-800"></div>
+                    {% endif %}
+                    
+                    <!-- Overlay -->
+                    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                    
+                    <!-- Content -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center text-white px-4 max-w-4xl">
+                            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in">
+                                {{ slide.title }}
+                            </h1>
+                            {% if slide.subtitle %}
+                                <p class="text-lg md:text-xl lg:text-2xl mb-6 text-gray-200 animate-slide-in">
+                                    {{ slide.subtitle }}
+                                </p>
+                            {% endif %}
+                            {% if slide.caption %}
+                                <p class="text-base md:text-lg mb-8 text-gray-300 max-w-2xl mx-auto">
+                                    {{ slide.caption }}
+                                </p>
+                            {% endif %}
+                            {% if slide.link_url and slide.link_text %}
+                                <a href="{{ slide.link_url }}" 
+                                   {% if slide.open_new_tab %}target="_blank"{% endif %}
+                                   class="inline-flex items-center px-6 py-3 bg-primary hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                    {{ slide.link_text }}
+                                    <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Navigation Arrows -->
+        {% if slider_images|length > 1 %}
+            <button class="slider-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm">
+                <i class="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button class="slider-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm">
+                <i class="fas fa-chevron-right text-xl"></i>
+            </button>
+            
+            <!-- Dots Indicator -->
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                {% for slide in slider_images %}
+                    <button class="slider-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all duration-200 {% if forloop.first %}bg-opacity-100{% endif %}"
+                            data-slide="{{ forloop.counter0 }}"></button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<!-- Fallback Hero Section -->
 <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
     <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div class="text-center">
@@ -24,168 +94,250 @@
         </div>
     </div>
 </div>
+{% endif %}
 
-<!-- About Section -->
+<!-- Statistics Cards -->
+<div class="py-12 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Students -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-accent transform hover:scale-105 transition-all duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-accent text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Students</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_students|default:"0" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Teachers -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-primary transform hover:scale-105 transition-all duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chalkboard-teacher text-primary text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Teachers</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_teachers|default:"0" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Established Year -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-warning transform hover:scale-105 transition-all duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-warning text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Established</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ school_established|default:"1950" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Years of Excellence -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 transform hover:scale-105 transition-all duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trophy text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Years of Excellence</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ school_established|default:"1950"|add:"-2024"|add:"-1"|default:"74" }}+</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Section -->
 <div class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8">{% trans "About" %} {{ school_name }}</h2>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-                {% blocktrans with school_name=school_name %}
-                {{ school_name }} has been a cornerstone of educational excellence in the community for over 70 years.
-                We are committed to providing quality education and nurturing young minds to become responsible
-                citizens and future leaders. Our dedicated faculty and modern facilities ensure that every student
-                receives the best possible education in a supportive and inspiring environment.
-                {% endblocktrans %}
-            </p>
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Quick Access" %}</h2>
+            <p class="text-gray-600">Access important sections quickly</p>
+            <div class="w-24 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <!-- Students -->
+            <a href="{% url 'main:students' %}" class="group">
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200 transform hover:scale-105 border border-green-200">
+                    <div class="w-16 h-16 bg-accent rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-accent mb-2">Total Students</h3>
+                    <p class="text-sm text-gray-600">View student statistics</p>
+                </div>
+            </a>
+
+            <!-- Exam Results -->
+            <a href="{% url 'main:exam_results' %}" class="group">
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200 transform hover:scale-105 border border-orange-200">
+                    <div class="w-16 h-16 bg-warning rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-warning mb-2">Exam Results</h3>
+                    <p class="text-sm text-gray-600">Check latest results</p>
+                </div>
+            </a>
+
+            <!-- Notices -->
+            <a href="{% url 'main:notices' %}" class="group">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200 transform hover:scale-105 border border-blue-200">
+                    <div class="w-16 h-16 bg-primary rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <i class="fas fa-bullhorn text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary mb-2">Notices</h3>
+                    <p class="text-sm text-gray-600">Latest announcements</p>
+                </div>
+            </a>
+
+            <!-- Gallery -->
+            <a href="{% url 'main:gallery' %}" class="group">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200 transform hover:scale-105 border border-purple-200">
+                    <div class="w-16 h-16 bg-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <i class="fas fa-images text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-purple-600 mb-2">Gallery</h3>
+                    <p class="text-sm text-gray-600">School memories</p>
+                </div>
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Latest Notices Section -->
-<div class="py-16 bg-gray-50">
+<div class="py-16 bg-gradient-to-br from-gray-50 to-indigo-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Latest Notices" %}</h2>
             <p class="text-gray-600">{% trans "Stay updated with our latest announcements" %}</p>
+            <div class="w-24 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
         </div>
         
         {% if latest_notices %}
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {% for notice in latest_notices %}
-                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow {% if notice.is_important %}border-l-4 border-red-500{% endif %}">
-                    <div class="flex items-center mb-2">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ notice.title }}</h3>
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105 {% if notice.is_important %}border-l-4 border-red-500{% endif %}">
+                    <div class="flex items-center mb-3">
+                        <h3 class="text-lg font-semibold text-gray-900 flex-1">{{ notice.title }}</h3>
                         {% if notice.is_important %}
-                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                Important
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>Important
                             </span>
                         {% endif %}
                     </div>
+                    
                     <div class="flex items-center text-sm text-gray-500 mb-4">
+                        <i class="fas fa-calendar-alt mr-2"></i>
                         <span>{{ notice.upload_date|date:"F d, Y" }}</span>
                         <span class="mx-2">•</span>
-                        <span class="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">{{ notice.get_notice_type_display }}</span>
+                        <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            <i class="fas fa-{% if notice.notice_type == 'pdf' %}file-pdf{% else %}align-left{% endif %} mr-1"></i>
+                            {{ notice.get_notice_type_display }}
+                        </span>
                     </div>
 
                     {% if notice.notice_type == 'text' %}
                         {% if notice.summary %}
-                            <p class="text-gray-600 text-sm mb-4">{{ notice.summary|truncatewords:15 }}</p>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ notice.summary|truncatewords:20 }}</p>
                         {% else %}
-                            <p class="text-gray-600 text-sm mb-4">{{ notice.content|truncatewords:15 }}</p>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ notice.content|truncatewords:20 }}</p>
                         {% endif %}
                         <a href="{% url 'main:notice_detail' notice.id %}"
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                            Read More
+                           class="inline-flex items-center px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-eye mr-2"></i>Read More
                         </a>
                     {% else %}
+                        <div class="mb-4">
+                            <p class="text-gray-600 text-sm">Click below to download the notice PDF file.</p>
+                        </div>
                         <a href="{{ notice.pdf_file.url }}" target="_blank"
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Download PDF
+                           class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>Download PDF
                         </a>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
             
-            <div class="text-center mt-8">
+            <div class="text-center mt-10">
                 <a href="{% url 'main:notices' %}" 
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                   class="inline-flex items-center px-6 py-3 bg-primary hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
                     View All Notices
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
+                    <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
         {% else %}
-            <div class="text-center py-8">
-                <p class="text-gray-500">No notices available at the moment.</p>
+            <div class="text-center py-12">
+                <i class="fas fa-bullhorn text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No Notices Available</h3>
+                <p class="text-gray-500">Latest notices will appear here once they are published.</p>
             </div>
         {% endif %}
     </div>
 </div>
 
-<!-- Quick Links Section -->
-<div class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Quick Links" %}</h2>
-        </div>
+<!-- Slider JavaScript -->
+{% if slider_images and slider_images|length > 1 %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dot');
+    const prevBtn = document.querySelector('.slider-prev');
+    const nextBtn = document.querySelector('.slider-next');
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('opacity-100', i === index);
+            slide.classList.toggle('opacity-0', i !== index);
+        });
         
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <a href="{% url 'main:notices' %}" class="group">
-                <div class="bg-blue-50 rounded-lg p-6 text-center hover:bg-blue-100 transition-colors">
-                    <div class="w-12 h-12 bg-blue-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600">Notices</h3>
-                </div>
-            </a>
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('bg-opacity-100', i === index);
+            dot.classList.toggle('bg-opacity-50', i !== index);
+        });
+        
+        currentSlide = index;
+    }
 
-            <a href="{% url 'main:teachers' %}" class="group">
-                <div class="bg-green-50 rounded-lg p-6 text-center hover:bg-green-100 transition-colors">
-                    <div class="w-12 h-12 bg-green-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-green-600">Teachers</h3>
-                </div>
-            </a>
+    function nextSlide() {
+        const next = (currentSlide + 1) % totalSlides;
+        showSlide(next);
+    }
 
-            <a href="{% url 'main:headmaster' %}" class="group">
-                <div class="bg-indigo-50 rounded-lg p-6 text-center hover:bg-indigo-100 transition-colors">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-indigo-600">Headmaster</h3>
-                </div>
-            </a>
+    function prevSlide() {
+        const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(prev);
+    }
 
-            <a href="{% url 'main:gallery' %}" class="group">
-                <div class="bg-teal-50 rounded-lg p-6 text-center hover:bg-teal-100 transition-colors">
-                    <div class="w-12 h-12 bg-teal-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-teal-600">Gallery</h3>
-                </div>
-            </a>
+    // Event listeners
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+    
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => showSlide(index));
+    });
 
-            <a href="{% url 'main:committee' %}" class="group">
-                <div class="bg-purple-50 rounded-lg p-6 text-center hover:bg-purple-100 transition-colors">
-                    <div class="w-12 h-12 bg-purple-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-purple-600">Committee</h3>
-                </div>
-            </a>
-
-            <a href="{% url 'main:contact' %}" class="group">
-                <div class="bg-orange-50 rounded-lg p-6 text-center hover:bg-orange-100 transition-colors">
-                    <div class="w-12 h-12 bg-orange-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-orange-600">Contact</h3>
-                </div>
-            </a>
-        </div>
-    </div>
-</div>
+    // Auto-play slider
+    setInterval(nextSlide, 5000);
+});
+</script>
+{% endif %}
 {% endblock %}

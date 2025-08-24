@@ -13,11 +13,27 @@
                     colors: {
                         primary: '#1e40af',
                         secondary: '#64748b',
+                        accent: '#059669',
+                        warning: '#d97706',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
                     }
                 }
             }
         }
     </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
@@ -40,19 +56,39 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                    <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Notices</a>
-                    <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Teachers</a>
-                    <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Headmaster</a>
-                    <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Gallery</a>
-                    <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Managing Committee</a>
-                    <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+                <div class="hidden lg:flex items-center space-x-6">
+                    <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-bullhorn mr-1"></i>Notices
+                    </a>
+                    <a href="{% url 'main:students' %}" class="text-gray-700 hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-green-50">
+                        <i class="fas fa-users mr-1"></i>Total Students
+                    </a>
+                    <a href="{% url 'main:exam_results' %}" class="text-gray-700 hover:text-warning px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-orange-50">
+                        <i class="fas fa-chart-line mr-1"></i>Exam Results
+                    </a>
+                    <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-chalkboard-teacher mr-1"></i>Teachers
+                    </a>
+                    <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-user-tie mr-1"></i>Headmaster
+                    </a>
+                    <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-images mr-1"></i>Gallery
+                    </a>
+                    <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-users-cog mr-1"></i>Committee
+                    </a>
+                    <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-blue-50">
+                        <i class="fas fa-envelope mr-1"></i>Contact
+                    </a>
                 </div>
 
                 <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button type="button" class="mobile-menu-button text-gray-700 hover:text-primary focus:outline-none focus:text-primary">
+                <div class="lg:hidden flex items-center">
+                    <button type="button" class="mobile-menu-button text-gray-700 hover:text-primary focus:outline-none focus:text-primary p-2 rounded-md hover:bg-gray-100 transition-colors">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -62,15 +98,35 @@
         </div>
 
         <!-- Mobile Navigation -->
-        <div class="mobile-menu hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
-                <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Notices</a>
-                <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Teachers</a>
-                <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Headmaster</a>
-                <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Gallery</a>
-                <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Managing Committee</a>
-                <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+        <div class="mobile-menu hidden lg:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 border-t border-gray-200">
+                <a href="{% url 'main:home' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a href="{% url 'main:notices' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-bullhorn mr-2"></i>Notices
+                </a>
+                <a href="{% url 'main:students' %}" class="text-gray-700 hover:text-accent block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-users mr-2"></i>Total Students
+                </a>
+                <a href="{% url 'main:exam_results' %}" class="text-gray-700 hover:text-warning block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>Exam Results
+                </a>
+                <a href="{% url 'main:teachers' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i>Teachers
+                </a>
+                <a href="{% url 'main:headmaster' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-user-tie mr-2"></i>Headmaster
+                </a>
+                <a href="{% url 'main:gallery' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-images mr-2"></i>Gallery
+                </a>
+                <a href="{% url 'main:committee' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-users-cog mr-2"></i>Committee
+                </a>
+                <a href="{% url 'main:contact' %}" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>Contact
+                </a>
             </div>
         </div>
     </nav>
@@ -82,10 +138,45 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-12 text-center">
-        <div class="border-t border-gray-700 mt-8 pt-6 text-center">
-            <p class="text-gray-400 text-sm text-center">© 2024 {{ school_name }}. All rights reserved.</p>
-            <p class="text-gray-400 text-sm text-center">This website is Developed by Md Arifur Rahman Anik</p>
+    <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- School Info -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-lg font-semibold mb-4">{{ school_name }}</h3>
+                    <p class="text-gray-300 text-sm">{{ school_tagline }}</p>
+                    {% if school_address %}
+                        <p class="text-gray-300 text-sm mt-2">{{ school_address }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <div class="space-y-2">
+                        <a href="{% url 'main:notices' %}" class="block text-gray-300 hover:text-white transition-colors">Notices</a>
+                        <a href="{% url 'main:students' %}" class="block text-gray-300 hover:text-white transition-colors">Students</a>
+                        <a href="{% url 'main:exam_results' %}" class="block text-gray-300 hover:text-white transition-colors">Results</a>
+                        <a href="{% url 'main:contact' %}" class="block text-gray-300 hover:text-white transition-colors">Contact</a>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="text-center md:text-right">
+                    <h3 class="text-lg font-semibold mb-4">Contact Us</h3>
+                    {% if school_phone %}
+                        <p class="text-gray-300 text-sm"><i class="fas fa-phone mr-2"></i>{{ school_phone }}</p>
+                    {% endif %}
+                    {% if school_email %}
+                        <p class="text-gray-300 text-sm mt-2"><i class="fas fa-envelope mr-2"></i>{{ school_email }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center">
+                <p class="text-gray-400 text-sm">© 2024 {{ school_name }}. All rights reserved.</p>
+                <p class="text-gray-400 text-sm mt-1">Developed by <span class="text-primary font-medium">Md Arifur Rahman Anik</span></p>
+            </div>
         </div>
     </footer>
 

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ result.title }} - {{ school_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{% url 'main:exam_results' %}" 
+               class="inline-flex items-center text-warning hover:text-orange-600 font-medium transition-colors duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Exam Results
+            </a>
+        </div>
+
+        <!-- Result Detail Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-8 text-white">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                        {% if result.result_type == 'pdf' %}
+                            <i class="fas fa-file-pdf text-3xl"></i>
+                        {% else %}
+                            <i class="fas fa-image text-3xl"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">{{ result.title }}</h1>
+                        <div class="flex items-center space-x-4 text-orange-100">
+                            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-graduation-cap mr-1"></i>Class {{ result.class_name }}
+                            </span>
+                            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-clipboard-list mr-1"></i>{{ result.get_exam_type_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6">
+                <!-- Exam Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                            <i class="fas fa-info-circle mr-2 text-blue-600"></i>Exam Information
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Class:</span>
+                                <span class="text-gray-900">Class {{ result.class_name }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Exam Type:</span>
+                                <span class="text-gray-900">{{ result.get_exam_type_display }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Exam Date:</span>
+                                <span class="text-gray-900">{{ result.exam_date|date:"F d, Y" }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Published:</span>
+                                <span class="text-gray-900">{{ result.result_publish_date|date:"F d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                            <i class="fas fa-file mr-2 text-green-600"></i>File Information
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">File Type:</span>
+                                <span class="text-gray-900">{{ result.get_result_type_display }}</span>
+                            </div>
+                            {% if result.get_file_extension %}
+                                <div class="flex items-center">
+                                    <span class="text-gray-600 font-medium w-32">Format:</span>
+                                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-medium">
+                                        {{ result.get_file_extension }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Uploaded:</span>
+                                <span class="text-gray-900">{{ result.upload_date|date:"F d, Y" }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-medium w-32">Uploaded by:</span>
+                                <span class="text-gray-900">{{ result.uploaded_by.get_full_name|default:result.uploaded_by.username }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                {% if result.description %}
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                            <i class="fas fa-align-left mr-2 text-purple-600"></i>Description
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-gray-700 leading-relaxed">{{ result.description }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Download Section -->
+                {% if result.result_file %}
+                    <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-6 border border-orange-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                    <i class="fas fa-download mr-2 text-orange-600"></i>Download Result
+                                </h3>
+                                <p class="text-gray-600">Click the button below to download the exam result file.</p>
+                            </div>
+                            <a href="{{ result.result_file.url }}" 
+                               target="_blank"
+                               class="inline-flex items-center px-6 py-3 bg-warning hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fas fa-download mr-2"></i>
+                                Download {{ result.get_file_extension|default:"File" }}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'main:exam_results' %}" 
+                       class="inline-flex items-center justify-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-list mr-2"></i>View All Results
+                    </a>
+                    
+                    {% if result.result_file %}
+                        <a href="{{ result.result_file.url }}" 
+                           target="_blank"
+                           class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-external-link-alt mr-2"></i>Open in New Tab
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Results -->
+        <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                <i class="fas fa-related mr-2"></i>Other Results for Class {{ result.class_name }}
+            </h3>
+            <div class="text-center py-8">
+                <p class="text-gray-600">
+                    <a href="{% url 'main:exam_results' %}?class={{ result.class_name }}" 
+                       class="text-warning hover:text-orange-600 font-medium">
+                        View all results for Class {{ result.class_name }} →
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

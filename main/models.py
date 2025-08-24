@@ -270,3 +270,145 @@ class ContactInfo(models.Model):
         if self.is_active:
             ContactInfo.objects.filter(is_active=True).exclude(pk=self.pk).update(is_active=False)
         super().save(*args, **kwargs)
+
+
+class Student(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
+    
+    CLASS_CHOICES = [
+        ('6', 'Class 6'),
+        ('7', 'Class 7'),
+        ('8', 'Class 8'),
+        ('9', 'Class 9'),
+        ('10', 'Class 10'),
+    ]
+    
+    SECTION_CHOICES = [
+        ('A', 'Section A'),
+        ('B', 'Section B'),
+        ('C', 'Section C'),
+    ]
+
+    name = models.CharField(max_length=100, help_text="Student's full name")
+    roll_number = models.CharField(max_length=20, help_text="Student roll number")
+    class_name = models.CharField(max_length=10, choices=CLASS_CHOICES, help_text="Student's class")
+    section = models.CharField(max_length=5, choices=SECTION_CHOICES, default='A', help_text="Student's section")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, help_text="Student's gender")
+    admission_date = models.DateField(help_text="Date of admission")
+    photo = models.ImageField(upload_to='students/', blank=True, null=True, help_text="Student's photo (optional)")
+    father_name = models.CharField(max_length=100, blank=True, help_text="Father's name")
+    mother_name = models.CharField(max_length=100, blank=True, help_text="Mother's name")
+    guardian_phone = models.CharField(max_length=20, blank=True, help_text="Guardian's phone number")
+    address = models.TextField(blank=True, help_text="Student's address")
+    is_active = models.BooleanField(default=True, help_text="Is currently enrolled")
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['class_name', 'section', 'roll_number']
+        unique_together = ['roll_number', 'class_name', 'section']
+        verbose_name = "Student"
+        verbose_name_plural = "Students"
+
+    def __str__(self):
+        return f"{self.name} - Class {self.class_name}{self.section} (Roll: {self.roll_number})"
+
+    def get_full_class(self):
+        """Return full class name with section"""
+        return f"Class {self.class_name}{self.section}"
+
+
+class ExamResult(models.Model):
+    RESULT_TYPE_CHOICES = [
+        ('pdf', 'PDF File'),
+        ('image', 'Image File'),
+    ]
+    
+    EXAM_TYPE_CHOICES = [
+        ('first_term', 'First Term'),
+        ('second_term', 'Second Term'),
+        ('final', 'Final Exam'),
+        ('test', 'Test Exam'),
+        ('annual', 'Annual Exam'),
+    ]
+    
+    CLASS_CHOICES = [
+        ('6', 'Class 6'),
+        ('7', 'Class 7'),
+        ('8', 'Class 8'),
+        ('9', 'Class 9'),
+        ('10', 'Class 10'),
+    ]
+
+    title = models.CharField(max_length=200, help_text="Result title (e.g., 'First Term Exam 2024')")
+    class_name = models.CharField(max_length=10, choices=CLASS_CHOICES, help_text="Class for this result")
+    exam_type = models.CharField(max_length=20, choices=EXAM_TYPE_CHOICES, help_text="Type of examination")
+    result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, default='pdf',
+                                   help_text="Choose file type for result")
+    
+    # File uploads
+    result_file = models.FileField(upload_to='exam_results/', blank=True, null=True,
+                                   help_text="Upload PDF or image file")
+    
+    # Additional information
+    exam_date = models.DateField(help_text="Date when exam was conducted")
+    result_publish_date = models.DateField(help_text="Date when result was published")
+    description = models.TextField(blank=True, help_text="Additional information about the exam")
+    
+    # Meta information
+    is_published = models.BooleanField(default=False, help_text="Make result visible to public")
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    upload_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-result_publish_date', 'class_name', 'exam_type']
+        verbose_name = "Exam Result"
+        verbose_name_plural = "Exam Results"
+
+    def __str__(self):
+        return f"{self.title} - Class {self.class_name} ({self.get_exam_type_display()})"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        if not self.result_file:
+            raise ValidationError("Result file is required.")
+
+    def get_file_extension(self):
+        """Get file extension for display purposes"""
+        if self.result_file:
+            return self.result_file.name.split('.')[-1].upper()
+        return None
+
+
+class HomepageSlider(models.Model):
+    title = models.CharField(max_length=200, help_text="Slide title")
+    subtitle = models.CharField(max_length=300, blank=True, help_text="Slide subtitle (optional)")
+    image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 1920x800px)")
+    caption = models.TextField(blank=True, help_text="Image caption or description")
+    
+    # Link options
+    link_url = models.URLField(blank=True, help_text="Optional link URL when slide is clicked")
+    link_text = models.CharField(max_length=100, blank=True, help_text="Link button text")
+    open_new_tab = models.BooleanField(default=False, help_text="Open link in new tab")
+    
+    # Display options
+    order = models.PositiveIntegerField(default=0, help_text="Display order (lower numbers first)")
+    is_active = models.BooleanField(default=True, help_text="Show this slide")
+    
+    # Meta information
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['order', '-created_date']
+        verbose_name = "Homepage Slider"
+        verbose_name_plural = "Homepage Sliders"
+
+    def __str__(self):
+        return f"{self.title} (Order: {self.order})"
