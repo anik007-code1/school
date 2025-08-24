@@ -1,0 +1,30 @@
+CRITICAL FILES FOR PRODUCTION DEPLOYMENT
+=======================================
+
+PRIORITY 1 - URL Configuration (Deploy First):
+main/urls.py
+
+PRIORITY 2 - Core Functionality:
+main/views.py
+main/models.py
+main/admin.py
+
+PRIORITY 3 - Templates:
+templates/base.html
+templates/main/home.html
+templates/main/students.html
+templates/main/exam_results.html
+templates/main/exam_result_detail.html
+
+OPTIONAL - Sample Data:
+main/management/commands/populate_new_features_data.py
+
+DEPLOYMENT COMMANDS:
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic (if needed)
+
+NEW URLS AFTER DEPLOYMENT:
+/students/
+/exam-results/
+/exam-result/<id>/
