@@ -415,7 +415,7 @@ class ExamResult(models.Model):
 
 
 class HomepageSlider(models.Model):
-    image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 1920x800px)")
+    image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 1280x540px)")
     order = models.PositiveIntegerField(default=0, help_text="Display order (lower numbers first)")
     is_active = models.BooleanField(default=True, help_text="Show this slide")
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
