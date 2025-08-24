@@ -188,9 +188,9 @@ def exam_results(request):
     
     # Apply filters
     if class_filter:
-        results_list = results_list.filter(class_name=class_filter)
+        results_list = results_list.filter(student_class__code=class_filter)
     if exam_type_filter:
-        results_list = results_list.filter(exam_type=exam_type_filter)
+        results_list = results_list.filter(exam_type__code=exam_type_filter)
     
     # Pagination
     paginator = Paginator(results_list, 10)  # Show 10 results per page
@@ -199,9 +199,9 @@ def exam_results(request):
     
     # Get available classes and exam types for filtering
     available_classes = ExamResult.objects.filter(is_published=True).values_list(
-        'class_name', flat=True).distinct().order_by('class_name')
+        'student_class__code', 'student_class__name').distinct().order_by('student_class__code')
     available_exam_types = ExamResult.objects.filter(is_published=True).values_list(
-        'exam_type', flat=True).distinct()
+        'exam_type__code', 'exam_type__name').distinct()
     
     context = {
         'page_obj': page_obj,

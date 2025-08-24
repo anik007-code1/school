@@ -358,6 +358,10 @@ class ExamResult(models.Model):
                                     help_text="Class for this result", null=True)
     exam_type = models.ForeignKey(ExamType, on_delete=models.PROTECT,
                                  help_text="Type of examination", null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.student_class or not self.exam_type:
+            raise ValueError("Both student_class and exam_type are required")
     result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, default='pdf',
                                    help_text="Choose file type for result")
     
@@ -424,3 +428,30 @@ class HomepageSlider(models.Model):
 
     def __str__(self):
         return f"Slider Image {self.id} (Order: {self.order})"
+
+
+class ClasswiseStudentCount(models.Model):
+    student_class = models.ForeignKey(StudentClass, on_delete=models.PROTECT,
+                                    help_text="Class for which to record student count")
+    academic_year = models.PositiveIntegerField(help_text="Academic year (e.g., 2025)")
+    total_students = models.PositiveIntegerField(help_text="Total number of students in this class")
+    total_male = models.PositiveIntegerField(help_text="Number of male students", default=0)
+    total_female = models.PositiveIntegerField(help_text="Number of female students", default=0)
+    last_updated = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['academic_year', 'student_class__order']
+        unique_together = ['student_class', 'academic_year']
+        verbose_name = "Class-wise Student Count"
+        verbose_name_plural = "Class-wise Student Counts"
+
+    def __str__(self):
+        return f"{self.student_class.name} - {self.academic_year} ({self.total_students} students)"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        # Validate that male + female equals total
+        if self.total_male + self.total_female != self.total_students:
+            raise ValidationError("Sum of male and female students must equal total students")

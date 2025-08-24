@@ -25,9 +25,9 @@
                     <label for="class" class="block text-sm font-medium text-gray-700 mb-2">Select Class</label>
                     <select name="class" id="class" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-warning focus:border-transparent">
                         <option value="">All Classes</option>
-                        {% for class_name in available_classes %}
-                            <option value="{{ class_name }}" {% if current_class == class_name %}selected{% endif %}>
-                                Class {{ class_name }}
+                        {% for class_code, class_name in available_classes %}
+                            <option value="{{ class_code }}" {% if current_class == class_code %}selected{% endif %}>
+                                {{ class_name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -38,14 +38,9 @@
                     <label for="exam_type" class="block text-sm font-medium text-gray-700 mb-2">Exam Type</label>
                     <select name="exam_type" id="exam_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-warning focus:border-transparent">
                         <option value="">All Exam Types</option>
-                        {% for exam_type in available_exam_types %}
-                            <option value="{{ exam_type }}" {% if current_exam_type == exam_type %}selected{% endif %}>
-                                {% if exam_type == 'first_term' %}First Term
-                                {% elif exam_type == 'second_term' %}Second Term
-                                {% elif exam_type == 'final' %}Final Exam
-                                {% elif exam_type == 'test' %}Test Exam
-                                {% elif exam_type == 'annual' %}Annual Exam
-                                {% else %}{{ exam_type|title }}{% endif %}
+                        {% for exam_code, exam_name in available_exam_types %}
+                            <option value="{{ exam_code }}" {% if current_exam_type == exam_code %}selected{% endif %}>
+                                {{ exam_name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -81,10 +76,10 @@
                                             <h3 class="text-xl font-bold text-gray-900">{{ result.title }}</h3>
                                             <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
                                                 <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                                    <i class="fas fa-graduation-cap mr-1"></i>Class {{ result.class_name }}
+                                                    <i class="fas fa-graduation-cap mr-1"></i>{{ result.student_class.name }}
                                                 </span>
                                                 <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                                    <i class="fas fa-clipboard-list mr-1"></i>{{ result.get_exam_type_display }}
+                                                    <i class="fas fa-clipboard-list mr-1"></i>{{ result.exam_type.name }}
                                                 </span>
                                                 <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
                                                     <i class="fas fa-file mr-1"></i>{{ result.get_file_extension }}

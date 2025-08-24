@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo,
                      GalleryCategory, GalleryImage, NavigationLink, ContactInfo,
-                     Student, ExamResult, HomepageSlider, ExamType, StudentClass)
+                     Student, ExamResult, HomepageSlider, ExamType, StudentClass, ClasswiseStudentCount)
 
 
 @admin.register(Notice)
@@ -121,7 +121,8 @@ class GalleryImageAdmin(admin.ModelAdmin):
 
 @admin.register(NavigationLink)
 class NavigationLinkAdmin(admin.ModelAdmin):
-    list_display = ['title', 'position', 'link_type', 'order', 'is_active', 'created_date']
+    list_display = ['title', 'position', 'link_type', 'order', 'is_active', 'created_date'
+                    ]
     list_filter = ['position', 'link_type', 'is_active', 'created_date']
     search_fields = ['title', 'title_bn', 'description']
     list_editable = ['order', 'is_active']
@@ -352,3 +353,29 @@ class StudentClassAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code', 'description']
     ordering = ['order', 'name']
     list_editable = ['order', 'is_active']
+
+
+@admin.register(ClasswiseStudentCount)
+class ClasswiseStudentCountAdmin(admin.ModelAdmin):
+    list_display = ['student_class', 'academic_year', 'total_students', 
+                    'total_male', 'total_female', 'last_updated']
+    list_filter = ['academic_year', 'student_class']
+    search_fields = ['student_class__name', 'academic_year']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('student_class', 'academic_year')
+        }),
+        ('Student Counts', {
+            'fields': ('total_students', 'total_male', 'total_female')
+        })
+    )
+    
+    def save_model(self, request, obj, form, change):
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing existing object
+            return ['student_class', 'academic_year']
+        return []
