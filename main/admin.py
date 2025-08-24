@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo,
                      GalleryCategory, GalleryImage, NavigationLink, ContactInfo,
-                     Student, ExamResult, HomepageSlider, ExamType, StudentClass, ClasswiseStudentCount)
+                     ExamResult, HomepageSlider, ExamType, StudentClass, ClasswiseStudentCount)
 
 
 @admin.register(Notice)
@@ -209,37 +209,8 @@ class ContactInfoAdmin(admin.ModelAdmin):
         return super().has_delete_permission(request, obj)
 
 
-@admin.register(Student)
-class StudentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'roll_number', 'class_name', 'section', 'gender', 'is_active', 'admission_date']
-    list_filter = ['class_name', 'section', 'gender', 'is_active', 'admission_date']
-    search_fields = ['name', 'roll_number']
-    list_editable = ['is_active']
-    date_hierarchy = 'admission_date'
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('name', 'roll_number', 'class_name', 'section', 'gender')
-        }),
-        ('Academic Information', {
-            'fields': ('admission_date', 'is_active')
-        })
-    )
-    
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related()
-    
-    actions = ['mark_active', 'mark_inactive']
-    
-    def mark_active(self, request, queryset):
-        queryset.update(is_active=True)
-        self.message_user(request, f"{queryset.count()} students marked as active.")
-    mark_active.short_description = "Mark selected students as active"
-    
-    def mark_inactive(self, request, queryset):
-        queryset.update(is_active=False)
-        self.message_user(request, f"{queryset.count()} students marked as inactive.")
-    mark_inactive.short_description = "Mark selected students as inactive"
+
+
 
 
 @admin.register(ExamResult)

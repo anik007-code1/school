@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.db.models import Count, Q
 from .models import (Notice, Teacher, CommitteeMember, Headmaster, GalleryCategory,
-                     GalleryImage, ContactInfo, Student, ExamResult, HomepageSlider)
+                     GalleryImage, ContactInfo, ExamResult, HomepageSlider, ClasswiseStudentCount)
 
 
 def home(request):
@@ -154,26 +154,31 @@ def switch_language(request, language_code):
 
 def students(request):
     """Students statistics view"""
-    # Get all active students
-    active_students = Student.objects.filter(is_active=True)
+    # Get the latest academic year's data
+    current_year = 2025  # You might want to make this dynamic
+    class_stats = ClasswiseStudentCount.objects.filter(academic_year=current_year)
     
-    # Calculate statistics
-    total_students = active_students.count()
-    male_students = active_students.filter(gender='male').count()
-    female_students = active_students.filter(gender='female').count()
+    # Calculate total statistics
+    total_students = sum(stat.total_students for stat in class_stats)
+    male_students = sum(stat.total_male for stat in class_stats)
+    female_students = sum(stat.total_female for stat in class_stats)
     
-    # Class-wise statistics
-    class_stats = active_students.values('class_name').annotate(
-        total=Count('id'),
-        male=Count('id', filter=Q(gender='male')),
-        female=Count('id', filter=Q(gender='female'))
-    ).order_by('class_name')
+    # Prepare class-wise data
+    class_stats_data = [
+        {
+            'class_name': stat.student_class.name,
+            'total': stat.total_students,
+            'male': stat.total_male,
+            'female': stat.total_female
+        }
+        for stat in class_stats
+    ]
     
     context = {
         'total_students': total_students,
         'male_students': male_students,
         'female_students': female_students,
-        'class_stats': class_stats
+        'class_stats': class_stats_data
     }
     return render(request, 'main/students.html', context)
 

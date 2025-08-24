@@ -304,47 +304,6 @@ class StudentClass(models.Model):
         return self.name
 
 
-class Student(models.Model):
-    GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
-    ]
-    
-    CLASS_CHOICES = [
-        ('6', 'Class 6'),
-        ('7', 'Class 7'),
-        ('8', 'Class 8'),
-        ('9', 'Class 9'),
-        ('10', 'Class 10'),
-    ]
-    
-    SECTION_CHOICES = [
-        ('A', 'Section A'),
-        ('B', 'Section B'),
-        ('C', 'Section C'),
-    ]
-
-    name = models.CharField(max_length=100, help_text="Student's full name")
-    roll_number = models.CharField(max_length=20, help_text="Student roll number")
-    class_name = models.CharField(max_length=10, choices=CLASS_CHOICES, help_text="Student's class")
-    section = models.CharField(max_length=5, choices=SECTION_CHOICES, default='A', help_text="Student's section")
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, help_text="Student's gender")
-    admission_date = models.DateField(help_text="Date of admission")
-    is_active = models.BooleanField(default=True, help_text="Is currently enrolled")
-
-    class Meta:
-        ordering = ['class_name', 'section', 'roll_number']
-        unique_together = ['roll_number', 'class_name', 'section']
-        verbose_name = "Student"
-        verbose_name_plural = "Students"
-
-    def __str__(self):
-        return f"{self.name} - Class {self.class_name}{self.section} (Roll: {self.roll_number})"
-
-    def get_full_class(self):
-        """Return full class name with section"""
-        return f"Class {self.class_name}{self.section}"
-
 
 class ExamResult(models.Model):
     RESULT_TYPE_CHOICES = [
@@ -415,7 +374,7 @@ class ExamResult(models.Model):
 
 
 class HomepageSlider(models.Model):
-    image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 1280x540px)")
+    image = models.ImageField(upload_to='slider/', help_text="Slider image (recommended: 800x400px)")
     order = models.PositiveIntegerField(default=0, help_text="Display order (lower numbers first)")
     is_active = models.BooleanField(default=True, help_text="Show this slide")
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
