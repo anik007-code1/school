@@ -272,6 +272,38 @@ class ContactInfo(models.Model):
         super().save(*args, **kwargs)
 
 
+class ExamType(models.Model):
+    name = models.CharField(max_length=50, help_text="Name of the exam type (e.g., 'First Term')")
+    code = models.CharField(max_length=20, unique=True, help_text="Short code for the exam type (e.g., 'first_term')")
+    description = models.TextField(blank=True, help_text="Description of this exam type")
+    order = models.PositiveIntegerField(default=0, help_text="Display order in lists")
+    is_active = models.BooleanField(default=True, help_text="Whether this exam type is currently in use")
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = "Exam Type"
+        verbose_name_plural = "Exam Types"
+
+    def __str__(self):
+        return self.name
+
+
+class StudentClass(models.Model):
+    name = models.CharField(max_length=50, help_text="Class name (e.g., 'Class 6')")
+    code = models.CharField(max_length=10, unique=True, help_text="Short code for the class (e.g., '6')")
+    description = models.TextField(blank=True, help_text="Description of this class")
+    order = models.PositiveIntegerField(default=0, help_text="Display order in lists")
+    is_active = models.BooleanField(default=True, help_text="Whether this class is currently accepting students")
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = "Student Class"
+        verbose_name_plural = "Student Classes"
+
+    def __str__(self):
+        return self.name
+
+
 class Student(models.Model):
     GENDER_CHOICES = [
         ('male', 'Male'),
@@ -320,26 +352,12 @@ class ExamResult(models.Model):
         ('image', 'Image File'),
         ('text', 'Text Content'),
     ]
-    
-    EXAM_TYPE_CHOICES = [
-        ('first_term', 'First Term'),
-        ('second_term', 'Second Term'),
-        ('final', 'Final Exam'),
-        ('test', 'Test Exam'),
-        ('annual', 'Annual Exam'),
-    ]
-    
-    CLASS_CHOICES = [
-        ('6', 'Class 6'),
-        ('7', 'Class 7'),
-        ('8', 'Class 8'),
-        ('9', 'Class 9'),
-        ('10', 'Class 10'),
-    ]
 
     title = models.CharField(max_length=200, help_text="Result title (e.g., 'First Term Exam 2024')")
-    class_name = models.CharField(max_length=10, choices=CLASS_CHOICES, help_text="Class for this result")
-    exam_type = models.CharField(max_length=20, choices=EXAM_TYPE_CHOICES, help_text="Type of examination")
+    student_class = models.ForeignKey(StudentClass, on_delete=models.PROTECT, 
+                                    help_text="Class for this result", null=True)
+    exam_type = models.ForeignKey(ExamType, on_delete=models.PROTECT,
+                                 help_text="Type of examination", null=True)
     result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, default='pdf',
                                    help_text="Choose file type for result")
     
@@ -363,12 +381,12 @@ class ExamResult(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-result_publish_date', 'class_name', 'exam_type']
+        ordering = ['-result_publish_date', 'student_class', 'exam_type']
         verbose_name = "Exam Result"
         verbose_name_plural = "Exam Results"
 
     def __str__(self):
-        return f"{self.title} - Class {self.class_name} ({self.get_exam_type_display()})"
+        return f"{self.title} - {self.student_class} ({self.exam_type})"
 
     def clean(self):
         from django.core.exceptions import ValidationError

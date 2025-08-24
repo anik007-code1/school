@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo,
                      GalleryCategory, GalleryImage, NavigationLink, ContactInfo,
-                     Student, ExamResult, HomepageSlider)
+                     Student, ExamResult, HomepageSlider, ExamType, StudentClass)
 
 
 @admin.register(Notice)
@@ -212,25 +212,17 @@ class ContactInfoAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     list_display = ['name', 'roll_number', 'class_name', 'section', 'gender', 'is_active', 'admission_date']
     list_filter = ['class_name', 'section', 'gender', 'is_active', 'admission_date']
-    search_fields = ['name', 'roll_number', 'father_name', 'mother_name']
+    search_fields = ['name', 'roll_number']
     list_editable = ['is_active']
     date_hierarchy = 'admission_date'
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'roll_number', 'class_name', 'section', 'gender', 'photo')
+            'fields': ('name', 'roll_number', 'class_name', 'section', 'gender')
         }),
         ('Academic Information', {
             'fields': ('admission_date', 'is_active')
-        }),
-        ('Family Information', {
-            'fields': ('father_name', 'mother_name', 'guardian_phone'),
-            'classes': ('collapse',)
-        }),
-        ('Contact Information', {
-            'fields': ('address',),
-            'classes': ('collapse',)
-        }),
+        })
     )
     
     def get_queryset(self, request):
@@ -251,8 +243,8 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(ExamResult)
 class ExamResultAdmin(admin.ModelAdmin):
-    list_display = ['title', 'class_name', 'exam_type', 'result_publish_date', 'is_published', 'uploaded_by']
-    list_filter = ['class_name', 'exam_type', 'is_published', 'result_publish_date', 'uploaded_by']
+    list_display = ['title', 'student_class', 'exam_type', 'result_publish_date', 'is_published', 'uploaded_by']
+    list_filter = ['student_class', 'exam_type', 'is_published', 'result_publish_date', 'uploaded_by']
     search_fields = ['title', 'description']
     list_editable = ['is_published']
     date_hierarchy = 'result_publish_date'
@@ -260,7 +252,7 @@ class ExamResultAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'class_name', 'exam_type', 'result_type')
+            'fields': ('title', 'student_class', 'exam_type', 'result_type')
         }),
         ('File Upload', {
             'fields': ('result_file',),
@@ -342,3 +334,21 @@ class HomepageSliderAdmin(admin.ModelAdmin):
         queryset.update(is_active=False)
         self.message_user(request, f"{queryset.count()} slides deactivated.")
     deactivate_slides.short_description = "Deactivate selected slides"
+
+
+@admin.register(ExamType)
+class ExamTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'code', 'order', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['name', 'code', 'description']
+    ordering = ['order', 'name']
+    list_editable = ['order', 'is_active']
+
+
+@admin.register(StudentClass)
+class StudentClassAdmin(admin.ModelAdmin):
+    list_display = ['name', 'code', 'order', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['name', 'code', 'description']
+    ordering = ['order', 'name']
+    list_editable = ['order', 'is_active']
