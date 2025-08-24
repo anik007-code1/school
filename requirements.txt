@@ -4,3 +4,10 @@ pillow==11.3.0
 sqlparse==0.5.3
 typing_extensions==4.14.1
 whitenoise==6.6.0
+
+python-dotenv==1.0.0
+redis==5.3.1
+psycopg2-binary==3.1.1
+whitenoise==8.1.1
+django-redis==5.2.0
+python-syslog==4.3.1
