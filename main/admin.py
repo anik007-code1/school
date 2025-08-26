@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Notice, Teacher, CommitteeMember, Headmaster, SchoolInfo,
+from .models import (Notice, Teacher, OtherEmployee, CommitteeMember, Headmaster, SchoolInfo,
                      GalleryCategory, GalleryImage, NavigationLink, ContactInfo,
                      ExamResult, HomepageSlider, ExamType, StudentClass, ClasswiseStudentCount)
 
@@ -328,7 +328,7 @@ class StudentClassAdmin(admin.ModelAdmin):
 
 @admin.register(ClasswiseStudentCount)
 class ClasswiseStudentCountAdmin(admin.ModelAdmin):
-    list_display = ['student_class', 'academic_year', 'total_students', 
+    list_display = ['student_class', 'academic_year', 'total_students',
                     'total_male', 'total_female', 'last_updated']
     list_filter = ['academic_year', 'student_class']
     search_fields = ['student_class__name', 'academic_year']
@@ -350,3 +350,11 @@ class ClasswiseStudentCountAdmin(admin.ModelAdmin):
         if obj:  # Editing existing object
             return ['student_class', 'academic_year']
         return []
+
+
+@admin.register(OtherEmployee)
+class OtherEmployeeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'designation', 'contact_info']
+    list_filter = ['designation']
+    search_fields = ['name', 'designation', 'contact_info']
+    fields = ['name', 'designation', 'photo', 'contact_info', 'bio']

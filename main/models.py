@@ -64,6 +64,22 @@ class Teacher(models.Model):
         return f"{self.name} - {self.designation}"
 
 
+class OtherEmployee(models.Model):
+    name = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100, help_text="e.g., Cleaner, Guard, Office Assistant")
+    photo = models.ImageField(upload_to='other_employee/', blank=True, null=True)
+    contact_info = models.CharField(max_length=200, blank=True)
+    bio = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Other Employee"
+        verbose_name_plural = "Other Employees"
+
+    def __str__(self):
+        return f"{self.name} - {self.designation}"
+
+
 class CommitteeMember(models.Model):
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
@@ -313,30 +329,43 @@ class ExamResult(models.Model):
     ]
 
     title = models.CharField(max_length=200, help_text="Result title (e.g., 'First Term Exam 2024')")
-    student_class = models.ForeignKey(StudentClass, on_delete=models.PROTECT, 
-                                    help_text="Class for this result", null=True)
-    exam_type = models.ForeignKey(ExamType, on_delete=models.PROTECT,
-                                 help_text="Type of examination", null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.student_class or not self.exam_type:
-            raise ValueError("Both student_class and exam_type are required")
-    result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, default='pdf',
-                                   help_text="Choose file type for result")
-    
+    student_class = models.ForeignKey(
+        StudentClass,
+        on_delete=models.PROTECT,
+        help_text="Class for this result",
+        null=False,
+        blank=False
+    )
+    exam_type = models.ForeignKey(
+        ExamType,
+        on_delete=models.PROTECT,
+        help_text="Type of examination",
+        null=False,
+        blank=False
+    )
+    result_type = models.CharField(
+        max_length=10,
+        choices=RESULT_TYPE_CHOICES,
+        default='pdf',
+        help_text="Choose file type for result"
+    )
     # File uploads
-    result_file = models.FileField(upload_to='exam_results/', blank=True, null=True,
-                                   help_text="Upload PDF or image file")
-    
+    result_file = models.FileField(
+        upload_to='exam_results/',
+        blank=True,
+        null=True,
+        help_text="Upload PDF or image file"
+    )
     # Text content
-    text_content = models.TextField(blank=True, null=True,
-                                  help_text="Enter result content if using text format")
-    
+    text_content = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Enter result content if using text format"
+    )
     # Additional information
     exam_date = models.DateField(help_text="Date when exam was conducted")
     result_publish_date = models.DateField(help_text="Date when result was published")
     description = models.TextField(blank=True, help_text="Additional information about the exam")
-    
     # Meta information
     is_published = models.BooleanField(default=False, help_text="Make result visible to public")
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -353,18 +382,20 @@ class ExamResult(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
-        
+
         if self.result_type in ['pdf', 'image'] and not self.result_file:
             raise ValidationError("File upload is required for PDF and Image type results.")
-        
         if self.result_type == 'text' and not self.text_content:
             raise ValidationError("Text content is required for Text type results.")
-        
         if self.result_type == 'text' and self.result_file:
             raise ValidationError("File should not be uploaded for Text type results.")
-        
         if self.result_type in ['pdf', 'image'] and self.text_content:
             raise ValidationError("Text content should be empty for PDF and Image type results.")
+
+    def save(self, *args, **kwargs):
+        if not self.student_class or not self.exam_type:
+            raise ValueError("Both student_class and exam_type are required")
+        super().save(*args, **kwargs)
 
     def get_file_extension(self):
         """Get file extension for display purposes"""

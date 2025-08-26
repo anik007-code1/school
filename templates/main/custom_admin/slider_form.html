@@ -1,0 +1,90 @@
+{% extends 'main/custom_admin/base.html' %}
+
+{% block title %}{% if slider %}Edit{% else %}Add{% endif %} Slider - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% if slider %}Edit Slider{% else %}Add New Slider{% endif %}</h1>
+        <a href="{% url 'main:slider_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Slider Image *</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="text-danger">{{ form.image.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Recommended size: 800x400px</small>
+                        </div>
+
+                        {% if slider and slider.image %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <img src="{{ slider.image.url }}" alt="Current slider" class="img-fluid" style="max-width: 300px;">
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.order.id_for_label }}" class="form-label">Display Order</label>
+                            {{ form.order }}
+                            {% if form.order.errors %}
+                                <div class="text-danger">{{ form.order.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Lower numbers appear first</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{% url 'main:slider_list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if slider %}Update{% else %}Save{% endif %} Slider
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Upload images in JPG or PNG format</li>
+                        <li>Recommended dimensions: 800x400 pixels</li>
+                        <li>Keep file size under 2MB for faster loading</li>
+                        <li>Set display order to control sequence</li>
+                        <li>Only active sliders will be displayed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

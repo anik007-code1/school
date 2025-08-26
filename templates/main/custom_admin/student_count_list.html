@@ -1,0 +1,73 @@
+{% extends 'main/custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Student Counts - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Class-wise Student Counts</h1>
+        <a href="{% url 'main:student_count_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Count
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            {% if counts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Academic Year</th>
+                                <th>Total Students</th>
+                                <th>Male</th>
+                                <th>Female</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for count in counts %}
+                                <tr>
+                                    <td><strong>{{ count.student_class.name }}</strong></td>
+                                    <td>{{ count.academic_year }}</td>
+                                    <td>{{ count.total_students }}</td>
+                                    <td>{{ count.total_male }}</td>
+                                    <td>{{ count.total_female }}</td>
+                                    <td>
+                                        <a href="{% url 'main:student_count_edit' count.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'main:student_count_delete' count.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h4>No student counts found</h4>
+                    <p class="text-muted">Add your first student count to get started.</p>
+                    <a href="{% url 'main:student_count_add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add First Count
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

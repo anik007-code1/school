@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0013_auto_20250824_1032'),
+        ('main', '0013_alter_examresult_fields'),
     ]
 
     operations = [

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Other Employee" %} - {{ school_info.name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">{% trans "Other Employee" %}</h1>
+        <p class="text-xl opacity-90">{% trans "Meet our dedicated support staff who keep the school running smoothly" %}</p>
+    </div>
+</section>
+
+<!-- Employee List -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for employee in page_obj %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                {% if employee.photo %}
+                <img src="{{ employee.photo.url }}" alt="{{ employee.name }}" class="w-full h-64 object-cover">
+                {% else %}
+                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-user-tie text-6xl text-gray-400"></i>
+                </div>
+                {% endif %}
+                
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ employee.name }}</h3>
+                    <p class="text-blue-600 font-semibold mb-3">{{ employee.designation }}</p>
+                    
+                    {% if employee.contact_info %}
+                    <div class="flex items-center text-gray-600 mb-2">
+                        <i class="fas fa-phone mr-2 text-blue-500"></i>
+                        <span>{{ employee.contact_info }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if employee.bio %}
+                    <p class="text-gray-600 text-sm leading-relaxed">{{ employee.bio|truncatewords:20 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="mt-12 flex justify-center">
+            <nav class="flex space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    {% trans "Previous" %}
+                </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                <a href="?page={{ num }}" 
+                   class="px-4 py-2 rounded {% if page_obj.number == num %}bg-blue-600 text-white{% else %}bg-white text-blue-600 border border-blue-600{% endif %} hover:bg-blue-600 hover:text-white transition">
+                    {{ num }}
+                </a>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    {% trans "Next" %}
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Empty State -->
+{% if not page_obj %}
+<section class="py-16">
+    <div class="container mx-auto px-4 text-center">
+        <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-600 mb-4">{% trans "No employees found" %}</h2>
+        <p class="text-gray-500">{% trans "Please check back later for updates on our support staff." %}</p>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

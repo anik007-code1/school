@@ -1,0 +1,66 @@
+{% extends 'main/custom_admin/base.html' %}
+
+{% block title %}Exam Results - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Exam Results</h1>
+        <a href="{% url 'main:exam_result_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Result
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if results %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Class</th>
+                                <th>Exam Type</th>
+                                <th>Publish Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                                <tr>
+                                    <td>{{ result.title|truncatechars:40 }}</td>
+                                    <td>{{ result.student_class.name }}</td>
+                                    <td>{{ result.exam_type.name }}</td>
+                                    <td>{{ result.result_publish_date|date:"d M, Y" }}</td>
+                                    <td>
+                                        {% if result.is_published %}
+                                            <span class="badge bg-success">Published</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'main:exam_result_edit' result.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'main:exam_result_delete' result.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No exam results found</h4>
+                    <p class="text-muted">Click "Add Result" to create the first record</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

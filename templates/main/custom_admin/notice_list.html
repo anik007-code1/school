@@ -1,0 +1,58 @@
+{% extends 'main/custom_admin/base.html' %}
+
+{% block title %}Manage Notices - School Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Manage Notices</h1>
+    <a href="{% url 'main:notice_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add New Notice
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Important</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notice in notices %}
+                    <tr>
+                        <td>{{ notice.title }}</td>
+                        <td>{{ notice.get_notice_type_display }}</td>
+                        <td>
+                            {% if notice.is_important %}
+                                <span class="badge bg-danger">Yes</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ notice.upload_date|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'main:notice_edit' notice.id %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'main:notice_delete' notice.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No notices found. <a href="{% url 'main:notice_add' %}">Add one</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'main/custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Homepage Sliders - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Homepage Sliders</h1>
+        <a href="{% url 'main:slider_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Slider
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            {% if sliders %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slider in sliders %}
+                                <tr>
+                                    <td>
+                                        {% if slider.image %}
+                                            <img src="{{ slider.image.url }}" alt="Slider" style="width: 100px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <span class="text-muted">No Image</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ slider.order }}</td>
+                                    <td>
+                                        {% if slider.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ slider.created_by.username }}</td>
+                                    <td>{{ slider.created_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'main:slider_edit' slider.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'main:slider_delete' slider.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <h4>No sliders found</h4>
+                    <p class="text-muted">Get started by adding your first homepage slider.</p>
+                    <a href="{% url 'main:slider_add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add First Slider
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
