@@ -399,35 +399,49 @@ def contact(request):
 def students(request):
     """Display students information page."""
     # Get all student counts for the latest academic year
-    latest_year = ClasswiseStudentCount.objects.aggregate(
-        max_year=models.Max('academic_year')
-    )['max_year'] or 2024
+    latest_year = ClasswiseStudentCount.objects.all().order_by('-academic_year').first()
+    if latest_year:
+        latest_year = latest_year.academic_year
+    else:
+        latest_year = 2024
     
     student_counts = ClasswiseStudentCount.objects.filter(
         academic_year=latest_year
     ).order_by('student_class__order')
     
-    # Calculate totals
-    total_students = sum(count.total_students for count in student_counts)
-    male_students = sum(count.total_male for count in student_counts)
-    female_students = sum(count.total_female for count in student_counts)
+    # Handle empty data gracefully
+    if not student_counts:
+        context = {
+            'total_students': 0,
+            'male_students': 0,
+            'female_students': 0,
+            'class_stats': [],
+            'no_data': True,
+        }
+    else:
+        # Calculate totals
+        total_students = sum(count.total_students for count in student_counts)
+        male_students = sum(count.total_male for count in student_counts)
+        female_students = sum(count.total_female for count in student_counts)
+        
+        # Prepare class-wise stats
+        class_stats = []
+        for count in student_counts:
+            class_stats.append({
+                'class_name': count.student_class.name,
+                'total': count.total_students,
+                'male': count.total_male,
+                'female': count.total_female
+            })
+        
+        context = {
+            'total_students': total_students,
+            'male_students': male_students,
+            'female_students': female_students,
+            'class_stats': class_stats,
+            'no_data': False,
+        }
     
-    # Prepare class-wise stats
-    class_stats = []
-    for count in student_counts:
-        class_stats.append({
-            'class_name': count.student_class.name,
-            'total': count.total_students,
-            'male': count.total_male,
-            'female': count.total_female
-        })
-    
-    context = {
-        'total_students': total_students,
-        'male_students': male_students,
-        'female_students': female_students,
-        'class_stats': class_stats,
-    }
     return render(request, 'main/students.html', context)
 
 
