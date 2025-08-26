@@ -398,9 +398,29 @@ def contact(request):
 
 def students(request):
     """Display students information page."""
+    # Get all student counts
     student_counts = ClasswiseStudentCount.objects.all().order_by('student_class__class_order')
+    
+    # Calculate totals
+    total_students = sum(count.total_students for count in student_counts)
+    male_students = sum(count.male_students for count in student_counts)
+    female_students = sum(count.female_students for count in student_counts)
+    
+    # Prepare class-wise stats
+    class_stats = []
+    for count in student_counts:
+        class_stats.append({
+            'class_name': count.student_class.name,
+            'total': count.total_students,
+            'male': count.male_students,
+            'female': count.female_students
+        })
+    
     context = {
-        'student_counts': student_counts,
+        'total_students': total_students,
+        'male_students': male_students,
+        'female_students': female_students,
+        'class_stats': class_stats,
     }
     return render(request, 'main/students.html', context)
 
