@@ -78,9 +78,9 @@ def committee(request):
 
 def headmaster(request):
     """Display headmaster page."""
-    headmasters = Headmaster.objects.all()
+    headmaster = Headmaster.objects.first()
     context = {
-        'headmasters': headmasters,
+        'headmaster': headmaster,
     }
     return render(request, 'main/headmaster.html', context)
 
@@ -369,11 +369,30 @@ def headmaster_edit(request, headmaster_id):
 def gallery(request):
     """Display gallery page with categories and images."""
     categories = GalleryCategory.objects.all()
-    images = GalleryImage.objects.all().order_by('-upload_date')[:12]  # Show latest 12 images
+    
+    # Get category filter
+    category_id = request.GET.get('category')
+    selected_category = None
+    
+    if category_id:
+        try:
+            selected_category = GalleryCategory.objects.get(id=category_id)
+            images = GalleryImage.objects.filter(category=selected_category)
+        except GalleryCategory.DoesNotExist:
+            images = GalleryImage.objects.all()
+    else:
+        images = GalleryImage.objects.all()
+    
+    # Apply pagination
+    images = images.order_by('-upload_date')
+    paginator = Paginator(images, 12)  # Show 12 images per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     context = {
         'categories': categories,
-        'images': images,
+        'page_obj': page_obj,
+        'selected_category': selected_category,
     }
     return render(request, 'main/gallery.html', context)
 
