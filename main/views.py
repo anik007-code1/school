@@ -406,10 +406,35 @@ def students(request):
 
 
 def exam_results(request):
-    """Display exam results page."""
-    results = ExamResult.objects.all().order_by('-result_publish_date')
+    """Display exam results page with filtering."""
+    # Get filter parameters
+    class_filter = request.GET.get('class', '')
+    exam_type_filter = request.GET.get('exam_type', '')
+    
+    # Base queryset - only show published results
+    results = ExamResult.objects.filter(is_published=True).order_by('-result_publish_date')
+    
+    # Apply filters
+    if class_filter:
+        results = results.filter(student_class__code=class_filter)
+    if exam_type_filter:
+        results = results.filter(exam_type__code=exam_type_filter)
+    
+    # Pagination
+    paginator = Paginator(results, 10)  # Show 10 results per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get available classes and exam types for filters
+    available_classes = StudentClass.objects.filter(is_active=True).values_list('code', 'name')
+    available_exam_types = ExamType.objects.filter(is_active=True).values_list('code', 'name')
+    
     context = {
-        'results': results,
+        'page_obj': page_obj,
+        'available_classes': available_classes,
+        'available_exam_types': available_exam_types,
+        'current_class': class_filter,
+        'current_exam_type': exam_type_filter,
     }
     return render(request, 'main/exam_results.html', context)
 
