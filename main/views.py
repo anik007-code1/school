@@ -398,13 +398,19 @@ def contact(request):
 
 def students(request):
     """Display students information page."""
-    # Get all student counts
-    student_counts = ClasswiseStudentCount.objects.all().order_by('student_class__class_order')
+    # Get all student counts for the latest academic year
+    latest_year = ClasswiseStudentCount.objects.aggregate(
+        max_year=models.Max('academic_year')
+    )['max_year'] or 2024
+    
+    student_counts = ClasswiseStudentCount.objects.filter(
+        academic_year=latest_year
+    ).order_by('student_class__order')
     
     # Calculate totals
     total_students = sum(count.total_students for count in student_counts)
-    male_students = sum(count.male_students for count in student_counts)
-    female_students = sum(count.female_students for count in student_counts)
+    male_students = sum(count.total_male for count in student_counts)
+    female_students = sum(count.total_female for count in student_counts)
     
     # Prepare class-wise stats
     class_stats = []
@@ -412,8 +418,8 @@ def students(request):
         class_stats.append({
             'class_name': count.student_class.name,
             'total': count.total_students,
-            'male': count.male_students,
-            'female': count.female_students
+            'male': count.total_male,
+            'female': count.total_female
         })
     
     context = {
